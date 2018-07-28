@@ -6,7 +6,7 @@ require("dotenv").config();
 var keys = require('./keys');
 
 var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+var twitter = new Twitter(keys.twitter);
 
 var omdbFunc = function (movieName) {
     var queryURL = "https://www.omdbapi.com/?t=" + movieName + "&plot=short&apikey=trilogy";
@@ -21,6 +21,21 @@ var omdbFunc = function (movieName) {
             "Language: " + movieData.Language + "\n" +
             "Plot: " + movieData.Plot + "\n" +
             "Actors: " + movieData.Actors + "\n");
+    })
+}
+
+var spotifyFunc = function (song) {
+    spotify.search({
+        type: 'track',
+        query: song
+    }, function (err, data) {
+        if (err) console.log(err);
+        var songData = data.tracks.items[0];
+        if (song == 'The Sign') songData = data.tracks.items[5];
+        console.log('Artist: ' + songData.artists[0].name + '\n' +
+            'Song name: ' + songData.name + '\n' +
+            'Preview url: ' + (songData.preview_url !== null ? songData.preview_url : 'none available') + '\n' +
+            'Album: ' + songData.album.name);
     })
 }
 
@@ -41,19 +56,7 @@ if (process.argv.length > 2) {
                     song += ' ' + process.argv[i];
                 }
             }
-            console.log(song);
-            spotify.search({
-                type: 'track',
-                query: song
-            }, function (err, data) {
-                if (err) console.log(err);
-                var songData = data.tracks.items[0];
-                if (song == 'The Sign') songData = data.tracks.items[5];
-                console.log('Artist: ' + songData.artists[0].name + '\n' +
-                    'Song name: ' + songData.name + '\n' +
-                    'Preview url: ' + (songData.preview_url !== null ? songData.preview_url : 'none available') + '\n' +
-                    'Album: ' + songData.album.name);
-            })
+            spotifyFunc(song);
             break;
         case 'movie-this':
             var movieName = '';

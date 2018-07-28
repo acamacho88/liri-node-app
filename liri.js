@@ -1,6 +1,7 @@
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
 var request = require('request');
+var fs = require('fs');
 
 require("dotenv").config();
 var keys = require('./keys');
@@ -39,40 +40,42 @@ var spotifyFunc = function (song) {
     })
 }
 
-if (process.argv.length > 2) {
-    var funcName = process.argv[2];
+var randomFunc = function () {
+    fs.readFile('random.txt', 'utf8', function (err, data) {
+        if (err) console.log(err);
+        var args = data.split(',');
+
+        main(args);
+    })
+}
+
+var main = function (args) {
+    var funcName = args[0];
     switch (funcName) {
         case 'my-tweets':
             break;
         case 'spotify-this-song':
             var song = '';
-            if (process.argv.length > 3) {
-                song = process.argv[3];
+            if (args.length > 1) {
+                song = args[1];
             } else {
                 song = 'The Sign';
-            }
-            if (process.argv.length > 4) {
-                for (var i = 4; i < process.argv.length; i++) {
-                    song += ' ' + process.argv[i];
-                }
             }
             spotifyFunc(song);
             break;
         case 'movie-this':
             var movieName = '';
-            if (process.argv.length > 3) {
-                movieName = process.argv[3];
+            if (args.length > 1) {
+                movieName = args[1];
             } else {
                 movieName = 'Mr+Nobody';
-            }
-            if (process.argv.length > 4) {
-                for (var i = 4; i < process.argv.length; i++) {
-                    movieName += '+' + process.argv[i];
-                }
             }
             omdbFunc(movieName);
             break;
         case 'do-what-it-says':
+            randomFunc();
             break;
     }
 }
+
+if (process.argv.length > 2) main(process.argv.slice(2));

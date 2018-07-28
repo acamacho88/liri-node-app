@@ -32,7 +32,12 @@ if (process.argv.length > 2) {
         case 'spotify-this-song':
             break;
         case 'movie-this':
-            var movieName = process.argv[3];
+            var movieName = '';
+            if (process.argv.length > 3) {
+                movieName = process.argv[3];
+            } else {
+                movieName = 'Mr+Nobody';
+            }
             if (process.argv.length > 4) {
                 for (var i = 4; i < process.argv.length; i++) {
                     movieName += '+' + process.argv[i];

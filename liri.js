@@ -9,6 +9,16 @@ var keys = require('./keys');
 var spotify = new Spotify(keys.spotify);
 var twitter = new Twitter(keys.twitter);
 
+var twitterFunc = function () {
+    var params = {
+        screen_name: "notarus57765570"
+    };
+    twitter.get('statuses/user_timeline', params, function (error, tweets, response) {
+        if (error) console.log(error);
+        console.log(tweets);
+    })
+}
+
 var omdbFunc = function (movieName) {
     var queryURL = "https://www.omdbapi.com/?t=" + movieName + "&plot=short&apikey=trilogy";
     request(queryURL, function (error, response, body) {
@@ -53,6 +63,7 @@ var main = function (args) {
     var funcName = args[0];
     switch (funcName) {
         case 'my-tweets':
+            twitterFunc();
             break;
         case 'spotify-this-song':
             var song = '';

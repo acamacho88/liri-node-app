@@ -9,13 +9,25 @@ var keys = require('./keys');
 var spotify = new Spotify(keys.spotify);
 var twitter = new Twitter(keys.twitter);
 
+var logData = function (data) {
+    fs.appendFile('log.txt', data, function (error) {
+        if (error) console.log(error);
+    })
+}
+
 var twitterFunc = function () {
     var params = {
         screen_name: "notarus57765570"
     };
     twitter.get('statuses/user_timeline', params, function (error, tweets, response) {
         if (error) console.log(error);
-        console.log(tweets);
+        var nTweets = tweets.length < 20 ? tweets.length : 20;
+        var output = '';
+        for (var i = 0; i < nTweets; i++) {
+            output += "Tweet: " + tweets[i].text + ", Created: " + tweets[i].created_at + "\n";
+        }
+        console.log(output);
+        logData(output);
     })
 }
 
@@ -24,14 +36,16 @@ var omdbFunc = function (movieName) {
     request(queryURL, function (error, response, body) {
         if (error) console.log(error);
         var movieData = JSON.parse(body);
-        console.log("Title: " + movieData.Title + "\n" +
+        var output = "Title: " + movieData.Title + "\n" +
             "Year: " + movieData.Year + "\n" +
             "IMDB Rating: " + movieData.imdbRating + "\n" +
             "RT Rating: " + movieData.Ratings[1].Value + "\n" +
             "Production country: " + movieData.Country + "\n" +
             "Language: " + movieData.Language + "\n" +
             "Plot: " + movieData.Plot + "\n" +
-            "Actors: " + movieData.Actors + "\n");
+            "Actors: " + movieData.Actors + "\n";
+        console.log(output);
+        logData(output);
     })
 }
 
@@ -43,10 +57,12 @@ var spotifyFunc = function (song) {
         if (err) console.log(err);
         var songData = data.tracks.items[0];
         if (song == 'The Sign') songData = data.tracks.items[5];
-        console.log('Artist: ' + songData.artists[0].name + '\n' +
+        var output = 'Artist: ' + songData.artists[0].name + '\n' +
             'Song name: ' + songData.name + '\n' +
             'Preview url: ' + (songData.preview_url !== null ? songData.preview_url : 'none available') + '\n' +
-            'Album: ' + songData.album.name);
+            'Album: ' + songData.album.name;
+        console.log(output);
+        logData(output);
     })
 }
 
@@ -89,4 +105,7 @@ var main = function (args) {
     }
 }
 
-if (process.argv.length > 2) main(process.argv.slice(2));
+if (process.argv.length > 2) {
+    logData("node liri " + process.argv.slice(2).join(' '));
+    main(process.argv.slice(2));
+}
